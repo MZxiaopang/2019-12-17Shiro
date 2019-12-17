@@ -1,0 +1,34 @@
+1：  导入redis属性文件
+2: 配置redis连接池
+3：配置redis链接工厂
+4：配置redis模版
+5：配置redis缓存管理
+6:配置我们的缓存配置类
+	1：缓存管理类需要继承Spring提供的CachingConfigurerSupport
+	2：缓存管理类中需要有redis链接工厂,redis模版,redis缓存管理 三个类的对象
+	3：需要使用@Configuration与@EnableCaching 用来表示配置类与开启缓存注解
+
+7：在需要缓存的serviceImpl方法上加上注解@Cacheable(value="keys",key="#root.target.selectall()")
+	Spring  会将value 当成key在redis中创建一个集合,集合中的value 就是我们指定的key,在查询的时候会先找
+	keys中有没有对应的value,如果有,则把value取出,然后将其当成key 寻找对应的数据
+		key 的定义可以是方法的参数值 如：
+		 @Cacheable(value="keys",key="#id")	
+		 public User selectById(int id){
+		 	mapper.selectById(id);
+		 }
+		或者是参数中对象的属性
+		 @Cacheable(value="keys",key="#user.name")	
+		 public User selectById(User user){
+		 	mapper.selectById(user);
+		 }
+		 或者用自定义的方法,root为Spring提供的内置对象,target为当前调用的对象,selectall()为当前类中方法
+		@Cacheable(value="keys",key="#root.target.selectall()")	
+		public List<User> selectAll() {		
+			return mapper.selectAll();
+		}	
+		public String selectall() {
+			return "haha";
+		}
+8：在需要更新缓存的方法上使用注解：@CacheEvict(value="keys",key="#root.target.selectall()",allEntries=true)
+		allEntries：默认等于false,如果值等于true,则会删除掉value中所有的值,并把value中值对应的所有
+		 数据都清空。

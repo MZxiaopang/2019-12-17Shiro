@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE generatorConfiguration PUBLIC "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN" "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd">
+<generatorConfiguration>
+
+	<context id="context1">
+	<commentGenerator>
+		<property name="suppressAllComments" value="true"/>
+	</commentGenerator>
+		<!-- 连接数据库 -->
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql:///test" userId="root" password="root"></jdbcConnection>
+		<!-- 指定生成model类的位置 -->
+		<javaModelGenerator targetPackage="com.zhiyou.model" targetProject="AutoCreateModelAndMappersrc\main\java"></javaModelGenerator>
+		<!-- 指定mapper文件生成的位置 -->
+		<sqlMapGenerator targetPackage="mapper" targetProject="AutoCreateModelAndMappersrc\main\resources"></sqlMapGenerator>
+		<!-- 指定接口生成的位置 -->
+		<javaClientGenerator type="XMLMAPPER" targetPackage="com.zhiyou.dao" targetProject="AutoCreateModelAndMappersrc\main\java"></javaClientGenerator>
+		<!-- 指定生成的数据库表名 -->
+		<table tableName="emp"/>
+		<table tableName="user"/>
+	</context>
+</generatorConfiguration>

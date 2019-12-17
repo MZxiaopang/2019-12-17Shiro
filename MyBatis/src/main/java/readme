@@ -1,0 +1,88 @@
+什么是MyBatis
+Myatis官网上说：支持定制化SQL，存储过程，高级映射的优秀持久性框架
+Myatis避免了所有的JDBC代码，与手动设置参数，遍历结果集的过程。
+Myatis可以对配置和原生的Map使用简单的XML或注解，将接口与Java的pojo（普通java对象）映射成数据库记录
+传统JDBC开发中遇到的问题：
+	1：数据库连接频繁创建，释放（使用数据库连接池解决）
+	2：sql语句存在硬编码，当需要修改sql的时候，需要修改对应的Java代码，不利于维护
+	3：使用preparedStatement像占位符传递参数的时候存在硬编码，因为sql语句后面的where一般都不是写死的
+	有可能多，有可能少，修改sql需要修改对应的Java代码。
+	4：对于结果分析存在硬编码（查询列明），sql变化会导致解析的结果集不一样，不利于维护，
+
+
+
+MyBatisConf.xml  用于数据库的配置文件 配置数据库环境 参数 等所有信息
+typeAlias:可以配置别名，type为类的权限定名  alias为别名
+properties:可以引入属性文件使用${key}进行去取值	<properties resource="db.properties"/>
+environments:数据库环境可以配置多个，但是的指定某一个
+
+
+
+mapper.xml 用于配置model 类与数据表的关联，一个mapper.xml对应与一个model类，对应于数据库的中的一张表
+其内元素：
+  <mapper namespace="suibianqiaode"> mapper为根元素  代表一个mapper.xml文件   namespace
+  则代表这个文件的命名空间  根据这个名称 可以定位到这个文件
+insert
+update
+delete
+select
+
+
+通用配置属性：
+
+元素					作用
+id:					sql的唯一标识符不能重复
+parameterType:		表示调用sql的时候需要的传递的参数类型,如果传如的是model类  可以在sql中使用#{}属性名来去出传入的model对象里的值
+			  		如果只有一个参数没并且是基本数据类型 可以省略不写 然后再sql中使用#{随便写} 取值
+
+resultType:			代表sql返回的结果集类型，可以直接指定model类，如果返回的是多条记录
+  					会自动转换成对应的model类型的list集合。需要：列明与model属性一致
+
+resultMap:			当model属性名与数据库列明不匹配的时候  可以定义resultMap 在其中指定数据库列名所对应的model属性
+
+
+statementID:mapper的namespace+sql的ID，使用statementID就能定位到具体需要执行的sql
+例如：session.insert("suibianqiaode.update", new User(88, "pp", "pp", 99));
+一、使用statementID  来进行数据操作存在的缺点：
+	1：传入的字符串参数statement只有在运行的时候才能知道是否错误
+	2：sql需要的参数无法限定，传入的错误 的参数止呕运行的时候才能发现
+
+二、使用Mapper接口的方式映射（当使用sqlsession 。getmapper 的时候mybatis会根据我们传入的接口，使用动态代理技术
+自动为其生产一个代理来实现类，并且在实现类中注入了sqlsession对象，让我们可以通过代理对象来完成数据库的操作）；
+1:保存接口的权限定名与mapperz中的namespace一致
+2；方法名保持与对应mapper中的id一致
+3；方法中的参数与mapper中的paremeterType一致
+4：方法中的返回值与mapper中的resultType一致
+
+动态sql标签：
+	if：判断,可以用来判断传过来的参数的值,返回结果为boolean,如果为true则直接if中的代码.
+		如果为false则不执行
+	set：会帮我们自动写set 关键字,并且会帮我们去除掉set作用域中最后的一个逗号(,)
+	where:会帮我们自动写where关键字,并且会帮我们去除掉where作用域中第一个and或or
+	choose:相当于Java中的switch,里面有多个when标签,当有一个when标签匹配的时候,剩下的
+		则不在执行，如果所有的when都没有进入则进入otherwise	
+	trim: 功能上类似于where,会在作用域的最前面加上指定前缀，并且可以去掉作用域中碰到的
+		 第一个指定内容,需要去掉的内容可以是多个,使用|分割,还可以指定后缀,并且去掉最后的
+		 相关内容。
+	foreach:循环标签其属性有：
+			collection：如果接口参数没有使用注解指定key,其内容为参数类型,否则填key
+			item: 会将循环集合内容取出然后赋值给其内元素
+			separator：每次循环的时候需要插入的分隔符
+			index：循环的索引 从0开始
+			open：循环开始的时候插入的内容(只执行一次)
+			close：在循环结束后插入的内容)(只执行一次)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

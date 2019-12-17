@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<properties resource="db.properties"/>
+
+	<typeAliases>
+		<typeAlias type="com.zhiyou.model.User" alias="user"/>
+	</typeAliases>
+	
+	<environments default="sss">
+		<environment id="sss">
+			<transactionManager type="org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory"></transactionManager>
+			<dataSource type="org.apache.ibatis.datasource.pooled.PooledDataSourceFactory">
+				<property name="driver" value="${driver}"/>
+				<property name="url" value="${url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+  		<mapper resource="mapper\Usermapper.xml" />
+  	</mappers>
+	
+	
+</configuration>
+
+
+

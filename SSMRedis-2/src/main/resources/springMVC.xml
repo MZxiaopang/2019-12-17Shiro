@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd 
+         http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd 
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- 1:扫面器-->
+	<context:component-scan base-package="com.zhiyou"/>
+
+	<!-- 2:SpringMVC 注解驱动 -->
+	<mvc:annotation-driven/>
+	<!-- mvc:默认的servlet处理程序 -->
+	<mvc:default-servlet-handler/>
+	
+	<!--3: 视图解析器 可以帮我们返回的视图自动加上后缀 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 4:加载db 属性文件 -->
+	<util:properties id="db" location="classpath:db.properties"></util:properties>
+	<!-- 5:配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="#{db.driver}"></property>
+		<property name="url" value="#{db.url}"></property>
+		<property name="username" value="#{db.username}"></property>
+		<property name="password" value="#{db.password}"></property>
+	</bean>
+	
+	<!-- 6:配置MyBatis sqlSession 工厂-->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 指定mybatis配置文件的位置 -->
+		<property name="configLocation" value="classpath:MyBatis.xml"></property>
+		<!-- 指定mapper文件的位置 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+	</bean>
+	
+	<!-- 7:配置dao(mapper)接口的扫描 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 配置dao(mapper)层接口所在的包的位置 -->
+		<property name="basePackage" value="com.zhiyou.dao"></property>
+		<!-- 引用MyBatis 的session工厂 -->
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- 1:导入redis属性文件 -->
+	<context:property-placeholder location="classpath:redis.properties"/>
+	<!-- 2:配置redis连接池 -->
+	<bean id="pool" class="redis.clients.jedis.JedisPoolConfig">
+	</bean>
+	<!-- 3:配置redis的连接工厂 -->
+	<bean id="connection" class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
+		<property name="poolConfig" ref="pool"/>
+		<property name="hostName" value="${redis.host}"></property>
+		<property name="port" value="${redis.port}"></property>
+		<property name="password" value="123456"></property>
+	</bean>
+	<!-- 4:配置redis模板 -->
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate">
+		<property name="connectionFactory" ref="connection"></property>
+	</bean>
+	<!--   5: 配置redis缓存管理 -->
+	<bean id="redisCacheManager" class="org.springframework.data.redis.cache.RedisCacheManager"> 
+		<constructor-arg name="redisOperations" ref="redisTemplate"></constructor-arg>
+	</bean>
+	<!-- 6：配置我们的缓存配置类 -->
+	<bean id="" class="com.zhiyou.redis.RedisCacheConfig">
+		<constructor-arg ref="connection"/>
+		<constructor-arg ref="redisTemplate"/>
+		<constructor-arg ref="redisCacheManager"/>
+	</bean>
+</beans>
+
+
+

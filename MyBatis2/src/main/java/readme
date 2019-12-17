@@ -1,0 +1,67 @@
+Many 2 One(多对一)
+
+在增加的时候由于关系是有多的一方来维护，所以 我们在每个员工对象中 让其有一个部门对象
+，插入的时候 需要先插入部门 等等数据库返回部门ID之后  在执行增加员工的操作，这样在增
+加员工的时候 才能知道部门ID是多少
+
+1:在多的一方model实体类中添加一个 一的一方对象（emp类中添加一个private Dept dept）
+2:在mapper.xml中使用 resultMap 中 使用association 来映射这个单个对象
+3:编写查询的sql  指定其结果集为对应的resultMap
+	（1）：可以使用单表查询，将查询出来的结果集 中的一列 作为参数 用于调用association对应的sql语句
+	（2）：直接使用多表查询，将查询出来的结果集通过resultMap封装，使用这种方式association不需要指定sql
+
+One 2 Many(一对多)
+1:在一的一方model实体类中 添加一个多的一方的集合对象 （dept 类中添加一个private List<EMP> emps）
+2:在mapper.xml resultMap 中使用collection 来映射这个集合，  对应Java类型为 ofType
+3:编写查询的sql  指定其结果集为对应的resultMap
+	（1）：可以使用单表查询，将查询出来的结果集 中的一列 作为参数 用于调用association对应的sql语句
+	（2）：直接使用多表查询，将查询出来的结果集通过resultMap封装，使用这种方式association不需要指定sql
+
+总结：需要映射的对象是一个的时候 ，association 如果需要映射的是集合的情况下使用collection
+
+
+
+数据库的延迟加载：当查询的时候，只有在调用相关联对象的时候才会去发送sql查询关联对象，
+可以优化（减少）查询数据库的次数，需要在MyBatis配置文件中开启
+
+N+1问题:当相关联对象较多的时候，查询数据会产生想关联对象 数量+1（本身查询sql）的sql语句
+
+解决：
+
+缓存:可以认为是内存中的一块区域，用来暂存一些数据，当相关应用被关闭后缓存被清空
+MyBatis的一级缓存是sqlSession级别，在多个数据库会话中间不共享，如果会话关闭则缓存被清空
+
+MyBatis的二级缓存：
+	默认是关闭的，需要在mapper.xml中开启，只有当sqlsession 关闭的时候，查询出来的数据才会放到缓存中。
+
+
+
+MyBatis 默认只支持一个参数的传递：
+	1：如果需要传入多个参数，可以在xml中根据下标取值。
+		<select id="selectByNameAndByLoc" >
+	 		select *form dept where dname=#{0} and loc=#{1};
+	 	</select>
+	2：我们可以把参数类型变成一个Map，然后再xml中通过map的key进行取值
+	3：使用param注解 让mybatis自动给我们的参数生成key
+
+
+#和$的区别:
+	#代表的是预编译对象，参数通过preparestatement占位符的形式类型传递过去
+	$参数是直接通过字符串拼接的方式拼接到sql中，无法防止sql注入。使用$拼接参数需要
+	配合Param注解一起使用
+	
+什么时候用#  什么时候用$:
+	一般情况下所有查询我们几乎都是用#来传递参数，因为其代表预编译对象，可以防止sql注入，执行效率较高。
+	但是如果我们传递的参数是数据库列名的话，如果使用#来传递参数  会在参数前后加上 ' ' 这样会导致查询出来的
+	数据不符合我们的要求，所以在这种情况下 需要使用$ 来把列名拼接上去
+
+
+
+作业：阅读mybatis 一级缓存和二级缓存的区别
+	练习使用MyBatis实现题目1，2，3，4的查询
+	对Emp 表 Dept 表， student 表 ，实现 增删改查  分页查询，通用模糊查询，通用修改查询，通用条件删除
+	实现通过Student 能查询 teacher  ,通过teacher 能查询出student
+
+
+
+

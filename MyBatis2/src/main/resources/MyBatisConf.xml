@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+
+	<properties resource="db.properties"/>
+	<!-- 全局启用或禁用延迟加载。当禁用时, 所有关联对象都会即时加载。 -->
+	 <settings>
+		<setting name="lazyLoadingEnabled" value="true"/>
+		<setting name="aggressiveLazyLoading" value="false"/>
+		<setting name="cacheEnabled" value="true"/>
+	</settings>  
+
+
+	<typeAliases>
+		<typeAlias type="com.zhiyou.model.Dept" alias="dept"/>
+		<typeAlias type="com.zhiyou.model.Emp" alias="emp"/>
+	</typeAliases>
+	
+	<environments default="sss">
+		<environment id="sss">
+			<transactionManager type="org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory"></transactionManager>
+			<dataSource type="org.apache.ibatis.datasource.pooled.PooledDataSourceFactory">
+				<property name="driver" value="${driver}"/>
+				<property name="url" value="${url}"/>
+				<property name="username" value="${username}"/>
+				<property name="password" value="${password}"/>
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+  		<mapper resource="mapper\empmapper.xml"/>
+  		<mapper resource="mapper\deptmapper.xml"/>
+  	</mappers>
+	
+	
+</configuration>
+
+
+

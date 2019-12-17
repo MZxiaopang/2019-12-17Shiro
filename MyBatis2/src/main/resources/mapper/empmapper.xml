@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+   <!-- namespace  : 代表这个文件的命名空间根据这个名称可以定位到这个文件 -->
+  <mapper namespace="com.zhiyou.mapper.EmpMapper"> 
+ 	
+ 	<insert id="add" parameterType="emp">
+ 		insert into emp values(null,#{ENAME},#{JOB},#{MGR},#{HIREDATE},#{SAL},#{COMM},#{dept.DEPTION});
+ 	</insert>
+ 	
+ 	<delete id="delete">
+ 		delete from emp where deptno=#{21}
+ 	</delete>
+ 	
+ 	<resultMap type="emp" id="empMap">
+ 		<id column="EMPNO" property="EMPNO"/>
+ 		<id column="ENAME" property="ENAME"/>
+ 		<id column="JOB" property="JOB"/>
+ 		<id column="MGR" property="MGR"/>
+ 		<id column="HIREDATE" property="HIREDATE"/>
+ 		<id column="SAL" property="SAL"/>
+ 		<id column="COMM" property="COMM"/>
+ 		<id column="DEPTNO" property="DEPTNO"/>
+ 		<!-- 
+ 			association:用来匹配单个对象
+ 				property:java Model中对象的属性名
+ 				column:执行的sql中那个列的值 作为后面sql的参数
+ 				select:指定调用那句sql语句来查询出相关联的对象
+ 		 -->
+ 		<association property="dept" column="DEPTNO" select="com.zhiyou.mapper.DeptMapper.selectById"></association>
+ 	</resultMap>
+ 	
+ 	<select id="selectById" resultMap="empMap">
+ 		select *from emp where empno=#{123}
+ 	</select>
+ 	
+ 	
+ 	<resultMap type="emp" id="empMap2">
+ 		<id column="EMPNO" property="EMPNO"/>
+ 		<result column="ENAME" property="ENAME"/>
+ 		<result column="JOB" property="JOB"/>
+ 		<result column="MGR" property="MGR"/>
+ 		<result column="HIREDATE" property="HIREDATE"/>
+ 		<result column="SAL" property="SAL"/>
+ 		<result column="COMM" property="COMM"/>
+ 		<result column="DEPTNO" property="DEPTNO"/>
+ 		<!-- 
+ 			association:用来匹配单个对象
+ 				property:java Model中对象的属性名
+ 				javaType:属性名对应的类型
+ 		 -->
+ 		
+ 		<association property="dept" javaType="com.zhiyou.model.Dept">
+ 			<id column="DEPTION" property="DEPTION"/>
+ 			<result column="DNAME" property="DNAME"/>
+ 			<result column="LOC" property="LOC"/>
+ 		</association>
+ 	</resultMap>
+ 	<select id="selectAll" resultMap="empMap2">
+ 		select *from emp;
+ 	</select>
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	
+ 	 
+ 	
+ 	
+ 	
+  	
+  </mapper>
