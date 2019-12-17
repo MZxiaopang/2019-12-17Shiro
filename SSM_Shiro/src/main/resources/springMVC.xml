@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:tx="http://www.springframework.org/schema/tx"
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd 
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd 
+         http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd 
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/util
+        http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<!-- 1:扫面器-->
+	<context:component-scan base-package="com.zhiyou"/>
+
+	<!-- 2:SpringMVC 注解驱动 -->
+	<mvc:annotation-driven/>
+	<!-- mvc:默认的servlet处理程序 -->
+	<mvc:default-servlet-handler/>
+	
+	<!--3: 视图解析器 可以帮我们返回的视图自动加上后缀 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	<!-- 4:加载db 属性文件 -->
+	<util:properties id="db" location="classpath:db.properties"></util:properties>
+	<!-- 5:配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+		<property name="driverClassName" value="#{db.driver}"></property>
+		<property name="url" value="#{db.url}"></property>
+		<property name="username" value="#{db.username}"></property>
+		<property name="password" value="#{db.password}"></property>
+	</bean>
+	
+	<!-- 6:配置MyBatis sqlSession 工厂-->
+	<bean id="sessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 指定mybatis配置文件的位置 -->
+		<property name="configLocation" value="classpath:MyBatis.xml"></property>
+		<!-- 指定mapper文件的位置 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"></property>
+	</bean>
+
+	<!-- 7:配置dao(mapper)接口的扫描 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 配置dao(mapper)层接口所在的包的位置 -->
+		<property name="basePackage" value="com.zhiyou.dao"></property>
+		<!-- 引用MyBatis 的session工厂 -->
+		<property name="sqlSessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- ************shiro***************** -->
+	<!-- 1:将realm  交给spring 管理 -->
+	<bean id="myRealm" class="com.zhiyou.realm.MyRealm"/>
+	<!-- 2：配置安全管理器 securityManager 然後将reaml 交给securityManager-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="myRealm"></property>
+	</bean>
+	<!-- 3:配置过滤器的属性（拦截规则） -->
+	<bean id="shiroF" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- 配置安全管理器 -->
+		<property name="securityManager" ref="securityManager"></property>
+		<!-- 指定认证授权 -->
+		<property name="loginUrl" value="/login"></property>
+		<!-- 指定权限不足的时候跳转页面 -->
+		<property name="unauthorizedUrl" value="/error.jsp"></property>
+		<!-- 定义过滤器链 -->
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- 退出路径 -->
+				/exit=logout
+				<!-- 配置不需要认证就能访问的界面  anon代表允许匿名访问  匿名访问代表不需要认证-->
+				/error.jsp=anon
+				/login.jsp=anon
+				<!-- 配置一些必须认证成功才能访问的页面  authc代表必须认证成功才能访问 -->
+				/showUser=authc
+				<!-- 配置必须admin权限才能访问的路径 -->
+				/delete=roles[admin]
+				/add=roles[admin]
+				/add=roles[admin2]
+				<!-- 配置所有的url都必须认证后才能访问 -->
+				/**=authc			
+			</value>
+		</property>
+	</bean>
+	
+</beans>
+
+
+
