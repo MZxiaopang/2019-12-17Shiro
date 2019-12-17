@@ -1,0 +1,61 @@
+一：认证的关键对象
+(1):subject:主体
+访问系统的用户或者程序 谁访问的谁就是主体
+(2):principle:身份信息
+是主体用来认证身份的一个标识符，标识符必须具有唯一性，例如 手机号 账号 邮箱
+(3):凭证信息
+只有主体自己知道的安全信息，例如  密码
+二：授权
+(1):访问控制，控制主体能访问哪些资源,(必须主体认证成功后 才需要授权)
+(2):授权的关键对象：
+who:主体需要访问的资源
+what:资源
+How:权限/许可
+
+一般所有的权限  都牵扯到数据库设计。再好的权限校验框架 如果数据库啥都没，也什么都实现不了
+1：主体表（usr  表  最少有账号  密码 以及角色信息）
+2：角色表
+3：权限表（对应着角色表，说明每个角色对应的权限）
+4：资源表（工资表，工作表等...）
+
+为什么要用shiro
+1：对比于spring 提供的权限校验 框架 更加独立
+2：使用简单 灵活 开源
+3：配置较为容易理解  spring的权限框架 配置较难
+4：不依赖于web容器 哪怕不是javaEE的项目 也可以正常使用 shiro
+
+shiro的架构：
+1：subject 
+	subject用来表示主体，外部应用于subject进行交互，subject记录了当前操作的用户
+	（shiro中的subject 是一个接口，接口里面定义了很多认证与授权的方法，用户通过subject进行认证授权）
+	subject通过securityManagar（安全管理器）进行认证授权。
+2：securityManager
+	securityManager（安全管理器），对全部的subject进行安全管理，它是shiro的核心负责对subject
+	进行安全管理（认证授权），但是实际上securityManager是通过Authenticator（认证器）进行认证
+	之后再通过Authorizer（授权） 进行授权操作，然后通过sessionManager（进行会话管理），
+	securityManager是一个接口 ，继承了Authenticator  Authorizer  SessionManager三个接口
+	
+3:Authenticator
+	Authenticator(认证器)是一个接口  主要对用户身份进行认证，Shiro提供一个实现类
+	ModularRealmAuthenticator  可以满足基本上的认证需求 当然我们也可以自己定义认证类。
+:4：Authorizer
+	Authorizer（授权） 是一个接口 主要对认证后的用户进行授权操作，然后在用户操作资源得失 
+	判断是否有对应的权限
+5：Realm
+	Realm(领域) 相当于datasource 数据源，securityManager进行安全认证操作的时候需要从
+	realm中获取用户权限数据  如果用户权限实在数据库中  则realm需要去数据库中获取权限
+6:sessionManager
+	sessionManager（会话管理），shiro有一套自己的会话管理  不依赖于web容器（tomcat）的session
+	可以很轻松的实现分布式会话管理以及单点登录
+
+7:sessionDAO
+	sessionDAO 就是会话dao是针对session会话的一套接口。
+8:cacheManager
+	CacheManager  缓存管理  可以将用户权限存到缓存中，不予哟啊每次访问资源都让realm查询数据
+9：cryptography
+	cryptography 密码管理  shiro提供一套加密/解密组件  ，方便开发。
+
+
+
+
+

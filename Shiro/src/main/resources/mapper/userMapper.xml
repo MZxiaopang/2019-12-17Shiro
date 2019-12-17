@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <!-- namespace  : 代表这个文件的命名空间根据这个名称可以定位到这个文件 -->
+  <mapper namespace="com.zhiyou.dao.UserDao"> 
+ 		<select id="selectByName" resultType="com.zhiyou.model.Usr">
+ 			select * from usr where username=#{0}
+ 		</select>
+
+  </mapper>
+  
+  
+  
+  
