@@ -108,7 +108,7 @@
 		<dependency>
 		    <groupId>org.springframework</groupId>		<!--组织唯一标识符  -->
 		    <artifactId>spring-webmvc</artifactId>		<!--项目唯一标识符  -->
-		    <version>4.3.18.RELEASE</version>			<!--版本标识符  -->
+		    <version>5.3.18</version>			<!--版本标识符  -->
 		 <!--    <scope>test</scope>--> 
 		</dependency>
 		<!-- Spring JDBC -->
